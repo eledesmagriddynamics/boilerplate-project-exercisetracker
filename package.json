@@ -12,9 +12,11 @@
     "prettier:check": "prettier --check ."
   },
   "dependencies": {
+    "@types/sqlite3": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.16.4",
+    "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "zod": "^3.25.7"
   },
