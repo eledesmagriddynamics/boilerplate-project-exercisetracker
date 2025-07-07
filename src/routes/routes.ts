@@ -1,7 +1,12 @@
 import { Router } from 'express';
+import { UserController } from '../controllers/userController';
 
-export function createApiRoutes() {
+export function createApiRoutes(
+  userController: UserController
+) {
   const router = Router();
+
+  router.post('/users', userController.createUser.bind(userController));
 
   router.get('/users', (req, res) => {
     // Simulate fetching users from a database
