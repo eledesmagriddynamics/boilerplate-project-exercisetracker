@@ -15,4 +15,9 @@ export class UserController {
       res.status(400).json({ error: error instanceof Error ? error.message : 'Invalid data' });
     }
   }
+
+  async getUsers(req: Request, res: Response) {
+    const users = await this.userModel.getAllUsers();
+    res.json(users);
+  }
 }
