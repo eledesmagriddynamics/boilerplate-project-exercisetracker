@@ -12,4 +12,8 @@ export class UserModel {
     );
     return { username, _id: result.lastID };
   }
+
+  async getAllUsers() {
+    return this.db.all('SELECT id as _id, username FROM users');
+  }
 }
