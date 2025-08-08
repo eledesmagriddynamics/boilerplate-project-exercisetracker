@@ -5,8 +5,10 @@ import { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { createApiRoutes } from './routes/routes'
 dotenv.config();
-import { UserController } from './controllers/userController';
 import { UserModel } from './models/userModel';
+import { ExerciseModel } from './models';
+import { UserController } from './controllers/userController';
+import { ExerciseController } from './controllers/exerciseController';
 import { initializeDB, runMigrations } from './database/db';
 
 const app = express();
@@ -25,9 +27,11 @@ const init = async () => {
   });
 
   const userModel = new UserModel(db);
+  const exerciseModel = new ExerciseModel(db);
   const userController = new UserController(userModel);
+  const exerciseController = new ExerciseController(exerciseModel, userModel);
 
-  app.use('/api', createApiRoutes(userController));
+  app.use('/api', createApiRoutes(userController, exerciseController));
 };
 
 init().catch((err) => {
