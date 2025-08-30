@@ -16,4 +16,8 @@ export class UserModel {
   async getAllUsers() {
     return this.db.all('SELECT id as _id, username FROM users');
   }
+
+  async getUserById(id: number) {
+    return this.db.get('SELECT id as _id, username FROM users WHERE id = ?', id);
+  }
 }
