@@ -3,14 +3,15 @@ import { UserModel } from '../models/userModel';
 import { ExerciseModel } from '../models';
 import { exerciseSchema } from '../validations/schema';
 import { ZodError } from 'zod';
+import { formatDateToString } from '../utils/dateUtils';
 
 export class ExerciseController {
   constructor(
     private exerciseModel: ExerciseModel,
-    private userModel: UserModel
-  ) {}
-  
-    async createExercise(req: Request, res: Response) {
+    private userModel: UserModel,
+  ) { }
+
+  async createExercise(req: Request, res: Response) {
     try {
       const userId = parseInt(req.params._id);
       const user = await this.userModel.getUserById(userId);
@@ -20,13 +21,18 @@ export class ExerciseController {
       }
 
       const exerciseData = exerciseSchema.parse(req.body);
-      await this.exerciseModel.createExercise(userId, exerciseData);
+      const newExercise = await this.exerciseModel.createExercise(
+        userId,
+        exerciseData,
+      );
+      const { description, duration, date } = newExercise;
 
-      res.json({
+      res.status(201).json({
         username: user.username,
-        ...exerciseData,
-        date: new Date(exerciseData.date || Date.now()).toDateString(),
-        _id: user._id
+        description,
+        duration,
+        date: formatDateToString(date),
+        _id: user._id,
       });
     } catch (error) {
       if (error instanceof ZodError) {
@@ -38,6 +44,7 @@ export class ExerciseController {
         return;
       }
       res.status(500).json({ error: 'Internal server error' });
+      return;
     }
   }
 }
