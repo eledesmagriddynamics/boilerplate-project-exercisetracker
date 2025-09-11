@@ -10,6 +10,7 @@ import { ExerciseModel } from './models';
 import { UserController } from './controllers/userController';
 import { ExerciseController } from './controllers/exerciseController';
 import { initializeDB, runMigrations } from './database/db';
+import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
@@ -32,6 +33,12 @@ const init = async () => {
   const exerciseController = new ExerciseController(exerciseModel);
 
   app.use('/api', createApiRoutes(userController, exerciseController, userModel));
+
+  app.use('*', (req, res) => {
+    res.status(404).json({ error: 'Not Found' });
+  });
+
+  app.use(errorHandler);
 };
 
 init().catch((err) => {

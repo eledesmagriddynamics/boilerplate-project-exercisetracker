@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { UserModel } from '../models/userModel';
 import { RequestWithUser } from '../interfaces/request';
+import { AppError } from '../errors';
 
 export const checkUserExists = (userModel: UserModel) => {
   return async (req: RequestWithUser, res: Response, next: NextFunction) => {
@@ -8,15 +9,13 @@ export const checkUserExists = (userModel: UserModel) => {
       const userId = parseInt(req.params._id);
       
       if (isNaN(userId) || userId <= 0) {
-        res.status(400).json({ error: 'Invalid user ID' });
-        return;
+        throw new AppError('Invalid user ID', 400);
       }
 
       const user = await userModel.getUserById(userId);
 
       if (!user) {
-        res.status(404).json({ error: 'User not found' });
-        return;
+        throw new AppError('User not found', 404);
       }
 
       req.user = user;
