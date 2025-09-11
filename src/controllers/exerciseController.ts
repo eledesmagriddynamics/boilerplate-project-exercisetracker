@@ -1,7 +1,6 @@
 import { Response } from 'express';
-import { ExerciseModel } from '../models';
-import { exerciseSchema } from '../validations/schema';
 import { ZodError } from 'zod';
+import { ExerciseModel } from '../models';
 import { formatDateToString } from '../utils/dateUtils';
 import { RequestWithUser } from '../interfaces/request';
 
@@ -17,8 +16,7 @@ export class ExerciseController {
       }
 
       const user = req.user;
-
-      const exerciseData = exerciseSchema.parse(req.body);
+      const exerciseData = req.body;
       const newExercise = await this.exerciseModel.createExercise(
         user._id,
         exerciseData,
