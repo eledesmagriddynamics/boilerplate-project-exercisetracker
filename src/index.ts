@@ -29,9 +29,9 @@ const init = async () => {
   const userModel = new UserModel(db);
   const exerciseModel = new ExerciseModel(db);
   const userController = new UserController(userModel);
-  const exerciseController = new ExerciseController(exerciseModel, userModel);
+  const exerciseController = new ExerciseController(exerciseModel);
 
-  app.use('/api', createApiRoutes(userController, exerciseController));
+  app.use('/api', createApiRoutes(userController, exerciseController, userModel));
 };
 
 init().catch((err) => {
