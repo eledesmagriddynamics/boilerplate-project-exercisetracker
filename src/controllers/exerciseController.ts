@@ -1,5 +1,4 @@
-import { Response } from 'express';
-import { ZodError } from 'zod';
+import { NextFunction, Response } from 'express';
 import { ExerciseModel } from '../models';
 import { formatDateToString } from '../utils/dateUtils';
 import { RequestWithUser } from '../interfaces/request';
@@ -9,7 +8,7 @@ export class ExerciseController {
     private exerciseModel: ExerciseModel,
   ) { }
 
-  async createExercise(req: RequestWithUser, res: Response) {
+  async createExercise(req: RequestWithUser, res: Response, next: NextFunction) {
     try {
       if (!req.user) {  // Ensure user is defined by middleware
         throw new Error('User not found in request');
@@ -31,16 +30,7 @@ export class ExerciseController {
         _id: user._id,
       });
     } catch (error) {
-      if (error instanceof ZodError) {
-        res.status(400).json({ error: error.issues });
-        return;
-      }
-      if (error instanceof Error) {
-        res.status(400).json({ error: error.message });
-        return;
-      }
-      res.status(500).json({ error: 'Internal server error' });
-      return;
+      next(error);
     }
   }
 }
