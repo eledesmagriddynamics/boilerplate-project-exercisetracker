@@ -19,3 +19,25 @@ export const exerciseSchema = z.object({
     .optional()
     .default(getCurrentDate),
 });
+
+export const exerciseLogQuerySchema = z.object({
+  from: z
+    .string()
+    .pipe(z.string().date())
+    .optional(),
+  to: z
+    .string()
+    .pipe(z.string().date())
+    .optional(),
+  limit: z
+    .coerce.number().positive('Limit must be a positive integer')
+    .optional()
+}).refine((data) => {
+  if (data.from && data.to) {
+    return new Date(data.from) <= new Date(data.to);
+  }
+  return true;
+}, {
+  message: 'from date must be before or equal to to date',
+  path: ['from']
+});
