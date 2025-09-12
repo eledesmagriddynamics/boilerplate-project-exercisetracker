@@ -43,6 +43,8 @@ export class ExerciseModel {
       query += ' AND date <= ?';
       params.push(options.to);
     }
+ 
+    query += ' ORDER BY Date ASC';
 
     // Add limit
     if (options.limit && options.limit > 0) {
