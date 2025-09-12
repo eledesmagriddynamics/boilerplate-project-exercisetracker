@@ -44,7 +44,7 @@ export class ExerciseModel {
       params.push(options.to);
     }
  
-    query += ' ORDER BY id DESC';
+    query += ' ORDER BY id ASC';
 
     // Add limit
     if (options.limit && options.limit > 0) {
