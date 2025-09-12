@@ -16,10 +16,11 @@ const app = express();
 
 const init = async () => {
   console.log('Initializing the app...');
+  app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   const db = await initializeDB();
-  runMigrations(db);
+  await runMigrations(db);
 
   app.use(cors());
   app.use(express.static('public'));
