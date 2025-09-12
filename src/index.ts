@@ -5,18 +5,41 @@ import { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { createApiRoutes } from './routes/routes'
 dotenv.config();
+import { UserModel } from './models/userModel';
+import { ExerciseModel } from './models';
+import { UserController } from './controllers/userController';
+import { ExerciseController } from './controllers/exerciseController';
+import { initializeDB, runMigrations } from './database/db';
+import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
 const init = async () => {
   console.log('Initializing the app...');
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
+  const db = await initializeDB();
+  await runMigrations(db);
 
   app.use(cors());
   app.use(express.static('public'));
   app.get('/', (req: Request, res: Response) => {
     res.sendFile('views/index.html', { root: path.join(__dirname, '../') });
   });
-  app.use('/api', createApiRoutes());
+
+  const userModel = new UserModel(db);
+  const exerciseModel = new ExerciseModel(db);
+  const userController = new UserController(userModel);
+  const exerciseController = new ExerciseController(exerciseModel);
+
+  app.use('/api', createApiRoutes(userController, exerciseController, userModel));
+
+  app.use('*', (req, res) => {
+    res.status(404).json({ error: 'Not Found' });
+  });
+
+  app.use(errorHandler);
 };
 
 init().catch((err) => {
