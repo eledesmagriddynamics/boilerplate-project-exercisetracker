@@ -1,3 +1,5 @@
+import { CreateExerciseRequest, Exercise } from "../interfaces";
+
 export class ExerciseModel {
   private db: any;
 
@@ -12,7 +14,7 @@ export class ExerciseModel {
     );
   }
 
-  async createExercise(userId: number, exercise: any) {
+  async createExercise(userId: number, exercise: CreateExerciseRequest): Promise<Exercise> {
     const { description, duration, date } = exercise;
     
     const result = await this.db.run(
