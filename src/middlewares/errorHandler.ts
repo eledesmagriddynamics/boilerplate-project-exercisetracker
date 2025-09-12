@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
-import { AppError } from '../errors';
+import { AppError, DatabaseError } from '../errors';
+import { mapDatabaseError } from '../utils/dataBaseErrorMapper';
 
 export const errorHandler = (
   error: Error,
@@ -8,21 +9,35 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error('errorHandler middleware:', error);
+  // Ideally log this on non production environments
+  console.error('Debug Error:', {
+    message: error.message,
+    stack: error.stack,
+    url: req.url,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
 
-  if (error instanceof AppError) {
-    res.status(error.statusCode).json({ error: error.message });
+  const mappedError = mapDatabaseError(error);
+
+  if (mappedError instanceof AppError) {
+    res.status(mappedError.statusCode).json({ error: mappedError.message });
     return;
   }
 
-  if (error instanceof ZodError) {
+  if (mappedError instanceof ZodError) {
     res.status(400).json({ 
       error: 'Validation failed',
-      details: error.issues.map(issue => ({
+      details: mappedError.issues.map(issue => ({
         field: issue.path.join('.'),
         message: issue.message
       }))
     });
+    return;
+  }
+
+  if (mappedError instanceof DatabaseError) {
+    res.status(mappedError.statusCode).json({ error: mappedError.message });
     return;
   }
   
